@@ -75,6 +75,26 @@ Seed the demo patient ("Dana"):
 python -m app.seed
 ```
 
+Running fully locally with open models (no cloud, no keys):
+
+```bash
+# 1. LLM via Ollama
+brew install ollama            # or see https://ollama.com
+ollama serve &
+ollama pull llama3.1
+
+# 2. Local transcription + embeddings
+pip install faster-whisper sentence-transformers
+
+# 3. Point the backend at them (backend/.env)
+AISCRIBE_LLM_PROVIDER=ollama
+AISCRIBE_TRANSCRIBE_PROVIDER=faster_whisper
+AISCRIBE_EMBED_PROVIDER=sentence_transformers
+
+# If you switch embedding models after seeding, rebuild the vectors:
+python -m app.reindex
+```
+
 ### Frontend
 
 ```bash
