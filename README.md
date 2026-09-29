@@ -110,6 +110,11 @@ npm run dev                 # http://localhost:5173
 - AI answers are **grounded and cited**: the chat only uses the patient's own documents and links back to the source.
 - This is a **prototype for research and demonstration**. It is not a medical device and does not provide medical advice.
 
+## Design document
+
+For a full build-from-scratch guide - architecture, data model, API, the AI-provider
+abstraction, and the calm design system - see [docs/DESIGN.md](docs/DESIGN.md).
+
 ## Contributing
 
 Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
