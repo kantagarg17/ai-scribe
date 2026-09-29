@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, DocumentItem, DocumentKind, VisitSummary } from "../api";
+import { IconVisit, IconLab, IconScan, IconDischarge } from "../icons";
 
 type Filter = "all" | DocumentKind;
 
@@ -17,6 +18,25 @@ const KIND_LABEL: Record<DocumentKind, string> = {
   scan: "Scan",
   discharge: "Discharge",
 };
+
+function KindIcon({ kind }: { kind: DocumentKind }) {
+  if (kind === "visit_note") return <IconVisit />;
+  if (kind === "lab") return <IconLab />;
+  if (kind === "scan") return <IconScan />;
+  return <IconDischarge />;
+}
+
+/** "2025-09-22" -> "Mon, Sep 22, 2025" for a calm, readable day label. */
+function formatDay(iso: string): string {
+  const d = new Date(iso + "T00:00:00");
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
 export default function Home({ patientId }: { patientId: number }) {
   const [filter, setFilter] = useState<Filter>("all");
@@ -43,6 +63,14 @@ export default function Home({ patientId }: { patientId: number }) {
   const latestVisit = visits[0];
   const shown = docs.filter((d) => filter === "all" || d.kind === filter);
 
+  // Group the timeline by day (docs already arrive newest-first).
+  const groups: { day: string; items: DocumentItem[] }[] = [];
+  for (const d of shown) {
+    const last = groups[groups.length - 1];
+    if (last && last.day === d.doc_date) last.items.push(d);
+    else groups.push({ day: d.doc_date, items: [d] });
+  }
+
   return (
     <div className="screen">
       <div className="subbar">
@@ -65,11 +93,11 @@ export default function Home({ patientId }: { patientId: number }) {
         ) : (
           <>
             {filter === "all" && latestVisit && (
-              <div className="card card-accent">
+              <div className="hero">
                 <div className="card-label">Latest visit summary</div>
                 <h3 className="card-title">{latestVisit.title}</h3>
                 <div className="card-meta" style={{ marginTop: 4 }}>
-                  {latestVisit.doc_date} · {latestVisit.next_steps.length} next steps
+                  {formatDay(latestVisit.doc_date)} · {latestVisit.next_steps.length} next steps
                 </div>
                 <p className="body-text">{latestVisit.summary}</p>
                 {latestVisit.next_steps.length > 0 && (
@@ -89,25 +117,41 @@ export default function Home({ patientId }: { patientId: number }) {
               <div className="state">Nothing here yet. Capture a visit or add a record.</div>
             )}
 
-            {shown.map((d) => (
-              <button
-                key={d.id}
-                className="card card-button"
-                onClick={() => setOpen(open === d.id ? null : d.id)}
-              >
-                <div className="card-head">
-                  <span className="kind-badge">{KIND_LABEL[d.kind]}</span>
-                  <span className="card-meta">{d.doc_date}</span>
+            {groups.map((g) => (
+              <div className="day-group" key={g.day}>
+                <div className="day-label">
+                  <span className="dot" />
+                  <span className="txt">{formatDay(g.day)}</span>
+                  <span className="rule" />
                 </div>
-                <h3 className="card-title" style={{ marginTop: 8 }}>
-                  {d.title}
-                </h3>
-                <p className="body-text">
-                  {open === d.id
-                    ? d.content
-                    : d.content.slice(0, 120).trim() + (d.content.length > 120 ? "…" : "")}
-                </p>
-              </button>
+                {g.items.map((d) => (
+                  <button
+                    key={d.id}
+                    className="card card-button"
+                    onClick={() => setOpen(open === d.id ? null : d.id)}
+                  >
+                    <div className="card-row">
+                      <span className={`kind-ic ${d.kind}`}>
+                        <KindIcon kind={d.kind} />
+                      </span>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div className="card-head">
+                          <span className="kind-badge">{KIND_LABEL[d.kind]}</span>
+                          <span className="card-meta">{d.doc_date}</span>
+                        </div>
+                        <h3 className="card-title" style={{ marginTop: 8 }}>
+                          {d.title}
+                        </h3>
+                        <p className="body-text">
+                          {open === d.id
+                            ? d.content
+                            : d.content.slice(0, 96).trim() + (d.content.length > 96 ? "…" : "")}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
             ))}
           </>
         )}

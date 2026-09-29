@@ -1,78 +1,92 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844" font-family="Inter, -apple-system, sans-serif">
   <defs>
-    <clipPath id="frame"><rect x="0" y="0" width="390" height="844" rx="40"/></clipPath>
+    <clipPath id="fr"><rect x="0" y="0" width="390" height="844" rx="40"/></clipPath>
+    <linearGradient id="hero" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#fbe9e2"/><stop offset="0.6" stop-color="#f3ece6"/><stop offset="1" stop-color="#e6efe7"/>
+    </linearGradient>
   </defs>
-  <g clip-path="url(#frame)">
-    <rect width="390" height="844" fill="#faf6f1"/>
+  <g clip-path="url(#fr)">
+    <rect width="390" height="844" fill="#f6f4ef"/>
 
     <!-- Header -->
-    <text x="22" y="46" fill="#8a7c8d" font-size="11.5" font-weight="600" letter-spacing="1.5">MY HEALTH RECORD</text>
-    <text x="22" y="78" fill="#2b1830" font-size="27" font-weight="600" font-family="Fraunces, Georgia, serif">Hi, Dana</text>
+    <text x="22" y="44" fill="#7fa68c" font-size="11.5" font-weight="600" letter-spacing="1.7">MY HEALTH RECORD</text>
+    <text x="22" y="76" fill="#2c2033" font-size="29" font-weight="600" font-family="Fraunces, Georgia, serif">Hi, Dana</text>
 
     <!-- Filter chips -->
     <g font-size="13.5" font-weight="500">
-      <rect x="22" y="100" width="48" height="34" rx="17" fill="#2b1830"/>
-      <text x="46" y="122" fill="#fff" text-anchor="middle">All</text>
-      <rect x="78" y="100" width="102" height="34" rx="17" fill="#fffdfb" stroke="#ece2d8"/>
-      <text x="129" y="122" fill="#5b4a5e" text-anchor="middle">Visit notes</text>
-      <rect x="188" y="100" width="60" height="34" rx="17" fill="#fffdfb" stroke="#ece2d8"/>
-      <text x="218" y="122" fill="#5b4a5e" text-anchor="middle">Labs</text>
-      <rect x="256" y="100" width="68" height="34" rx="17" fill="#fffdfb" stroke="#ece2d8"/>
-      <text x="290" y="122" fill="#5b4a5e" text-anchor="middle">Scans</text>
+      <rect x="22" y="96" width="48" height="34" rx="17" fill="#3a2742"/>
+      <text x="46" y="118" fill="#fff" text-anchor="middle">All</text>
+      <rect x="78" y="96" width="102" height="34" rx="17" fill="#fffefb" stroke="#e2d9cd"/>
+      <text x="129" y="118" fill="#6a5c6e" text-anchor="middle">Visit notes</text>
+      <rect x="188" y="96" width="58" height="34" rx="17" fill="#fffefb" stroke="#e2d9cd"/>
+      <text x="217" y="118" fill="#6a5c6e" text-anchor="middle">Labs</text>
+      <rect x="254" y="96" width="66" height="34" rx="17" fill="#fffefb" stroke="#e2d9cd"/>
+      <text x="287" y="118" fill="#6a5c6e" text-anchor="middle">Scans</text>
     </g>
 
-    <!-- Latest visit summary card (accent) -->
-    <rect x="18" y="162" width="354" height="248" rx="20" fill="#fbeae4" stroke="#f4c9bd"/>
-    <text x="38" y="192" fill="#e8836b" font-size="12" font-weight="600" letter-spacing="1.2">LATEST VISIT SUMMARY</text>
-    <text x="38" y="218" fill="#2b1830" font-size="19" font-weight="600" font-family="Fraunces, Georgia, serif">Oncology visit with Dr. Mauro</text>
-    <text x="38" y="238" fill="#8a7c8d" font-size="13">2025-09-22 · 3 next steps</text>
-    <text x="38" y="264" fill="#5b4a5e" font-size="14">
-      <tspan x="38" dy="0">The visit confirmed an early-stage (stage two)</tspan>
-      <tspan x="38" dy="19">breast cancer that is hormone driven (ER and PR</tspan>
-      <tspan x="38" dy="19">positive, HER2 negative), which responds well to</tspan>
-      <tspan x="38" dy="19">treatment.</tspan>
+    <!-- Hero: latest visit summary -->
+    <rect x="18" y="146" width="354" height="256" rx="26" fill="url(#hero)" stroke="#fbe9e2"/>
+    <text x="38" y="176" fill="#d9765e" font-size="11" font-weight="700" letter-spacing="1.3">LATEST VISIT SUMMARY</text>
+    <text x="38" y="200" fill="#2c2033" font-size="18.5" font-weight="600" font-family="Fraunces, Georgia, serif">Oncology visit with Dr. Mauro</text>
+    <text x="38" y="220" fill="#9b8f9e" font-size="12.5">Mon, Sep 22, 2025 · 3 next steps</text>
+    <text x="38" y="246" fill="#6a5c6e" font-size="14">
+      <tspan x="38" dy="0">An early-stage (stage two), hormone-driven breast</tspan>
+      <tspan x="38" dy="19">cancer (ER and PR positive, HER2 negative) that</tspan>
+      <tspan x="38" dy="19">responds well to treatment.</tspan>
     </text>
-    <!-- steps -->
-    <line x1="38" y1="352" x2="354" y2="352" stroke="#f4c9bd"/>
-    <rect x="38" y="360" width="20" height="20" rx="7" fill="#fff" stroke="#f4c9bd"/>
-    <text x="68" y="375" fill="#5b4a5e" font-size="14">Call the surgery office this week</text>
-    <line x1="38" y1="388" x2="354" y2="388" stroke="#f4c9bd"/>
-    <rect x="38" y="396" width="20" height="20" rx="7" fill="#4c9a72"/>
-    <path d="M43 406 l3 3 l6 -6" stroke="#fff" stroke-width="2" fill="none"/>
-    <text x="68" y="411" fill="#8a7c8d" font-size="14" text-decoration="line-through">Watch for fever over 100.4</text>
+    <line x1="38" y1="320" x2="352" y2="320" stroke="#e7d9d1"/>
+    <rect x="38" y="330" width="22" height="22" rx="8" fill="#fff" stroke="#7fa68c"/>
+    <text x="70" y="346" fill="#6a5c6e" font-size="14">Call the surgery office this week</text>
+    <line x1="38" y1="364" x2="352" y2="364" stroke="#e7d9d1"/>
+    <rect x="38" y="374" width="22" height="22" rx="8" fill="#6fae87"/>
+    <path d="M44 385 l3.5 3.5 l6.5 -6.5" stroke="#fff" stroke-width="2" fill="none"/>
+    <text x="70" y="390" fill="#9b8f9e" font-size="14" text-decoration="line-through">Watch for fever over 100.4</text>
 
-    <!-- Scan card -->
-    <rect x="18" y="424" width="354" height="118" rx="20" fill="#fffdfb" stroke="#ece2d8"/>
-    <rect x="38" y="444" width="44" height="22" rx="11" fill="#f3ece3"/>
-    <text x="60" y="459" fill="#5b4a5e" font-size="11" font-weight="600" text-anchor="middle" letter-spacing="0.5">SCAN</text>
-    <text x="352" y="459" fill="#8a7c8d" font-size="13" text-anchor="end">2025-09-10</text>
-    <text x="38" y="490" fill="#2b1830" font-size="19" font-weight="600" font-family="Fraunces, Georgia, serif">Right breast ultrasound</text>
-    <text x="38" y="514" fill="#5b4a5e" font-size="14">
-      <tspan x="38" dy="0">1.8 cm irregular mass at the 10 o'clock position…</tspan>
-      <tspan x="38" dy="18">BI-RADS 4 - biopsy recommended.</tspan>
-    </text>
+    <!-- Day label -->
+    <circle cx="26" cy="432" r="4" fill="#7fa68c"/>
+    <text x="38" y="436" fill="#6a5c6e" font-size="12.5" font-weight="600">Wed, Sep 10, 2025</text>
+    <line x1="180" y1="432" x2="372" y2="432" stroke="#ece5db"/>
 
-    <!-- Lab card -->
-    <rect x="18" y="556" width="354" height="96" rx="20" fill="#fffdfb" stroke="#ece2d8"/>
-    <rect x="38" y="576" width="36" height="22" rx="11" fill="#f3ece3"/>
-    <text x="56" y="591" fill="#5b4a5e" font-size="11" font-weight="600" text-anchor="middle" letter-spacing="0.5">LAB</text>
-    <text x="352" y="591" fill="#8a7c8d" font-size="13" text-anchor="end">2025-09-15</text>
-    <text x="38" y="622" fill="#2b1830" font-size="19" font-weight="600" font-family="Fraunces, Georgia, serif">Biopsy pathology</text>
-    <text x="38" y="644" fill="#5b4a5e" font-size="14">Invasive ductal carcinoma, ER+/PR+, HER2-…</text>
+    <!-- Scan card with icon tile -->
+    <rect x="18" y="452" width="354" height="112" rx="20" fill="#fffefb" stroke="#ece5db"/>
+    <rect x="34" y="470" width="42" height="42" rx="13" fill="#fbe9e2"/>
+    <g stroke="#d9765e" stroke-width="1.8" fill="none" stroke-linecap="round">
+      <path d="M46 484v-2a2 2 0 0 1 2-2h2M62 480h2a2 2 0 0 1 2 2v2M66 500v2a2 2 0 0 1-2 2h-2M50 504h-2a2 2 0 0 1-2-2v-2"/>
+      <circle cx="56" cy="491" r="3"/>
+    </g>
+    <rect x="90" y="470" width="44" height="20" rx="10" fill="#efeae2"/>
+    <text x="112" y="484" fill="#6a5c6e" font-size="10.5" font-weight="600" text-anchor="middle" letter-spacing="0.5">SCAN</text>
+    <text x="356" y="484" fill="#9b8f9e" font-size="12.5" text-anchor="end">2025-09-10</text>
+    <text x="90" y="510" fill="#2c2033" font-size="18.5" font-weight="600" font-family="Fraunces, Georgia, serif">Right breast ultrasound</text>
+    <text x="90" y="532" fill="#6a5c6e" font-size="14">1.8 cm irregular mass, BI-RADS 4…</text>
 
-    <!-- Bottom tab bar -->
-    <rect x="0" y="768" width="390" height="76" fill="#fffdfb"/>
-    <line x1="0" y1="768" x2="390" y2="768" stroke="#ece2d8"/>
-    <!-- Record (active) -->
-    <path d="M46 792 l16 -13 l16 13 v19 a1 1 0 0 1 -1 1 h-8 v-12 h-12 v12 h-8 a1 1 0 0 1 -1 -1 z" fill="none" stroke="#2b1830" stroke-width="1.8" stroke-linejoin="round"/>
-    <text x="62" y="828" fill="#2b1830" font-size="11" font-weight="600" text-anchor="middle">Record</text>
-    <!-- Capture -->
-    <rect x="188" y="782" width="12" height="18" rx="6" fill="none" stroke="#8a7c8d" stroke-width="1.8"/>
-    <path d="M182 794 a12 12 0 0 0 24 0 M194 802 v6" stroke="#8a7c8d" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-    <text x="194" y="828" fill="#8a7c8d" font-size="11" text-anchor="middle">Capture</text>
-    <!-- Ask -->
-    <path d="M312 784 h20 a4 4 0 0 1 4 4 v12 a4 4 0 0 1 -4 4 h-14 l-6 6 v-6 a4 4 0 0 1 -4 -4 v-12 a4 4 0 0 1 4 -4 z" fill="none" stroke="#8a7c8d" stroke-width="1.8" stroke-linejoin="round"/>
-    <text x="326" y="828" fill="#8a7c8d" font-size="11" text-anchor="middle">Ask</text>
+    <!-- Day label -->
+    <circle cx="26" cy="594" r="4" fill="#7fa68c"/>
+    <text x="38" y="598" fill="#6a5c6e" font-size="12.5" font-weight="600">Mon, Sep 15, 2025</text>
+    <line x1="180" y1="594" x2="372" y2="594" stroke="#ece5db"/>
+
+    <!-- Lab card with icon tile -->
+    <rect x="18" y="614" width="354" height="112" rx="20" fill="#fffefb" stroke="#ece5db"/>
+    <rect x="34" y="632" width="42" height="42" rx="13" fill="#eee7f4"/>
+    <path d="M52 640v6.2l-4.4 7.8a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L58 646.2V640M51 640h8M51 650h8"
+      stroke="#7a5a86" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="90" y="632" width="36" height="20" rx="10" fill="#efeae2"/>
+    <text x="108" y="646" fill="#6a5c6e" font-size="10.5" font-weight="600" text-anchor="middle" letter-spacing="0.5">LAB</text>
+    <text x="356" y="646" fill="#9b8f9e" font-size="12.5" text-anchor="end">2025-09-15</text>
+    <text x="90" y="672" fill="#2c2033" font-size="18.5" font-weight="600" font-family="Fraunces, Georgia, serif">Biopsy pathology</text>
+    <text x="90" y="694" fill="#6a5c6e" font-size="14">Invasive ductal carcinoma, ER+/PR+…</text>
+
+    <!-- Footer nav -->
+    <rect x="0" y="776" width="390" height="68" fill="#fffefb"/>
+    <line x1="0" y1="776" x2="390" y2="776" stroke="#ece5db"/>
+    <circle cx="62" cy="800" r="15" fill="#e6efe7"/>
+    <path d="M50 802 l12 -10 l12 10 v13 a1 1 0 0 1 -1 1 h-6 v-9 h-10 v9 h-6 a1 1 0 0 1 -1 -1 z" fill="none" stroke="#3a2742" stroke-width="1.8" stroke-linejoin="round"/>
+    <text x="62" y="832" fill="#3a2742" font-size="11" font-weight="600" text-anchor="middle">Record</text>
+    <rect x="189" y="791" width="12" height="17" rx="6" fill="none" stroke="#9b8f9e" stroke-width="1.8"/>
+    <path d="M183 802 a12 12 0 0 0 24 0 M195 810 v5" stroke="#9b8f9e" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <text x="195" y="832" fill="#9b8f9e" font-size="11" text-anchor="middle">Capture</text>
+    <path d="M314 792 h18 a4 4 0 0 1 4 4 v11 a4 4 0 0 1 -4 4 h-13 l-5 5 v-5 a4 4 0 0 1 -4 -4 v-11 a4 4 0 0 1 4 -4 z" fill="none" stroke="#9b8f9e" stroke-width="1.8" stroke-linejoin="round"/>
+    <text x="326" y="832" fill="#9b8f9e" font-size="11" text-anchor="middle">Ask</text>
   </g>
-  <rect x="0.5" y="0.5" width="389" height="843" rx="40" fill="none" stroke="#e6dccf"/>
+  <rect x="0.5" y="0.5" width="389" height="843" rx="40" fill="none" stroke="#e2d9cd"/>
 </svg>

@@ -165,14 +165,18 @@ export default function Record({
 
         {!useText ? (
           <>
-            <button
-              className={`mic ${phase === "recording" ? "recording" : ""}`}
-              onClick={phase === "recording" ? stopRecording : startRecording}
-              disabled={phase === "processing"}
-              aria-label={phase === "recording" ? "Stop recording" : "Start recording"}
-            >
-              {phase === "recording" ? <IconStop /> : <IconMicLarge />}
-            </button>
+            <div className={`mic-wrap ${phase === "recording" ? "breathing" : ""}`}>
+              <span className="ring r1" />
+              <span className="ring r2" />
+              <button
+                className={`mic ${phase === "recording" ? "recording" : ""}`}
+                onClick={phase === "recording" ? stopRecording : startRecording}
+                disabled={phase === "processing"}
+                aria-label={phase === "recording" ? "Stop recording" : "Start recording"}
+              >
+                {phase === "recording" ? <IconStop /> : <IconMicLarge />}
+              </button>
+            </div>
 
             {phase === "idle" && (
               <div className="consent">

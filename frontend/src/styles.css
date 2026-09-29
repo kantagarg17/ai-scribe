@@ -1,30 +1,51 @@
 :root {
-  /* Palette drawn from the team deck: warm paper, deep plum, coral. */
-  --paper: #faf6f1;
-  --paper-2: #f3ece3;
-  --card: #fffdfb;
-  --ink: #2b1830;
-  --ink-2: #5b4a5e;
-  --ink-3: #8a7c8d;
-  --plum: #2b1830;
-  --coral: #e8836b;
-  --coral-soft: #f4c9bd;
-  --coral-tint: #fbeae4;
-  --line: #ece2d8;
-  --good: #4c9a72;
-  --danger: #b4573f;
-  --shadow-sm: 0 1px 2px rgba(43, 24, 48, 0.04), 0 4px 14px rgba(43, 24, 48, 0.05);
-  --shadow-lg: 0 20px 60px rgba(43, 24, 48, 0.18);
-  --radius: 20px;
-  --radius-sm: 14px;
+  /* ---------------------------------------------------------------
+     Palette — calm and spacious, in the spirit of meditation / Forest
+     apps, keeping the team deck's plum + coral identity but softened,
+     with a sage "calm" accent and gentle gradient surfaces.
+     --------------------------------------------------------------- */
+  --paper: #f6f4ef;          /* warm off-white canvas */
+  --paper-2: #efeae2;
+  --card: #fffefb;
+  --ink: #2c2033;            /* soft plum-black */
+  --ink-2: #6a5c6e;
+  --ink-3: #9b8f9e;
+
+  --plum: #3a2742;
+  --plum-soft: #6f5a78;
+  --coral: #e8927c;          /* softened coral */
+  --coral-deep: #d9765e;
+  --coral-tint: #fbe9e2;
+  --sage: #7fa68c;           /* calm eucalyptus accent */
+  --sage-tint: #e6efe7;
+  --gold: #e6b566;
+
+  --line: #ece5db;
+  --line-2: #e2d9cd;
+  --good: #6fae87;
+
+  /* Gentle gradients for hero + capture surfaces */
+  --grad-calm: linear-gradient(160deg, #f3ede4 0%, #e9eee7 100%);
+  --grad-hero: linear-gradient(155deg, #fbe9e2 0%, #f3ece6 60%, #e6efe7 100%);
+  --grad-mic: radial-gradient(circle at 50% 40%, #efa88f 0%, #e8927c 55%, #d9765e 100%);
+  --grad-mic-rec: radial-gradient(circle at 50% 40%, #6f5a78 0%, #3a2742 100%);
+
+  --shadow-xs: 0 1px 2px rgba(44, 32, 51, 0.05);
+  --shadow-sm: 0 2px 6px rgba(44, 32, 51, 0.05), 0 8px 22px rgba(44, 32, 51, 0.05);
+  --shadow-md: 0 6px 18px rgba(44, 32, 51, 0.08), 0 18px 44px rgba(44, 32, 51, 0.08);
+  --shadow-lg: 0 24px 70px rgba(44, 32, 51, 0.18);
+
+  --r-lg: 26px;
+  --r-md: 20px;
+  --r-sm: 14px;
+
   --serif: "Fraunces", Georgia, serif;
   --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   /* Fixed layout rails so proportions never shift with content. */
-  --header-h: 76px;
-  --footer-h: 64px;
-  --bar-h: 56px;
-  --maxw: 440px;
+  --header-h: 84px;
+  --footer-h: 68px;
+  --maxw: 448px;
 }
 
 * {
@@ -52,10 +73,9 @@ button {
 }
 
 /* ============================================================
-   App shell: a stable grid. The frame is ALWAYS
-   [header | scrollable main | footer]. Content only ever
-   changes the middle row; the grid tracks never move, so
-   proportions stay fixed on scroll, tab switch, or resize.
+   App shell: a stable grid — [header | scrollable main | footer].
+   Grid tracks never move, so proportions stay fixed on scroll,
+   tab switch, or resize.
    ============================================================ */
 .app {
   height: 100dvh;
@@ -77,14 +97,16 @@ button {
   position: relative;
 }
 
-/* Desktop / tablet: center a phone-like card with a soft page backdrop. */
 @media (min-width: 600px) {
   .app {
-    padding: 24px;
+    padding: 28px;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #efe7dd 0%, rgba(239, 231, 221, 0) 60%),
+      var(--paper-2);
   }
   .device {
-    height: min(920px, calc(100dvh - 48px));
-    border-radius: 32px;
+    height: min(936px, calc(100dvh - 56px));
+    border-radius: 38px;
     border: 1px solid var(--line);
     box-shadow: var(--shadow-lg);
   }
@@ -92,7 +114,7 @@ button {
 
 /* ---------------- Header (fixed grid row) ---------------- */
 .header {
-  padding: 16px 20px 8px;
+  padding: 20px 22px 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -100,42 +122,36 @@ button {
 }
 .eyebrow {
   font-size: 11.5px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--sage);
   font-weight: 600;
 }
 .greeting {
   font-family: var(--serif);
-  font-size: 27px;
+  font-size: 29px;
   font-weight: 600;
-  margin: 2px 0 0;
-  letter-spacing: -0.01em;
-  line-height: 1.1;
+  margin: 3px 0 0;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* ---------------- Main (the ONLY scroll container) ----------------
-   Every screen renders a .screen inside this row. The screen owns its
-   own layout (optional sticky sub-bar + scroll area + optional docked
-   composer), but the grid row height is fixed by the shell. */
+/* ---------------- Main (the ONLY scroll container) ---------------- */
 .main {
-  min-height: 0; /* critical: lets the grid row scroll instead of grow */
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
-
 .screen {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
-
-/* A scrollable body used by every screen. */
 .scroll {
   flex: 1;
   min-height: 0;
@@ -143,21 +159,22 @@ button {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  padding: 8px 16px 20px;
+  padding: 10px 18px 24px;
 }
 .scroll::-webkit-scrollbar {
   width: 8px;
 }
 .scroll::-webkit-scrollbar-thumb {
-  background: var(--line);
+  background: var(--line-2);
   border-radius: 8px;
 }
 
-/* ---------------- Footer nav (fixed grid row) ---------------- */
+/* ---------------- Footer nav ---------------- */
 .tabbar {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  background: var(--card);
+  background: rgba(255, 254, 251, 0.9);
+  backdrop-filter: blur(14px);
   border-top: 1px solid var(--line);
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -168,20 +185,35 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   color: var(--ink-3);
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
-  transition: color 0.15s ease;
+  transition: color 0.18s ease;
+  position: relative;
 }
 .tabbar button.active {
   color: var(--plum);
+}
+.tabbar button.active::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--sage-tint);
+  z-index: 0;
 }
 .tabbar .ic {
   display: grid;
   place-items: center;
   height: 24px;
+  z-index: 1;
+}
+.tabbar .lbl {
+  z-index: 1;
 }
 
 /* ---------------- Sticky sub-bar (filter chips) ---------------- */
@@ -189,17 +221,16 @@ button {
   flex: 0 0 auto;
   display: flex;
   gap: 8px;
-  padding: 4px 16px 12px;
+  padding: 2px 18px 12px;
   overflow-x: auto;
   scrollbar-width: none;
-  border-bottom: 1px solid transparent;
 }
 .subbar::-webkit-scrollbar {
   display: none;
 }
 .chip {
   flex: 0 0 auto;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-2);
   background: var(--card);
   color: var(--ink-2);
   border-radius: 999px;
@@ -207,7 +238,7 @@ button {
   font-size: 13.5px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
   white-space: nowrap;
 }
 .chip.active {
@@ -216,36 +247,78 @@ button {
   border-color: var(--plum);
 }
 
+/* ---------------- Timeline (schedule-app inspired) ---------------- */
+.day-group {
+  margin-bottom: 8px;
+}
+.day-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 2px 10px;
+}
+.day-label .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sage);
+  flex: 0 0 auto;
+}
+.day-label .txt {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+}
+.day-label .rule {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* ---------------- Hero card ---------------- */
+.hero {
+  border-radius: var(--r-lg);
+  padding: 20px;
+  background: var(--grad-hero);
+  border: 1px solid var(--coral-tint);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+.hero .card-label {
+  color: var(--coral-deep);
+}
+
 /* ---------------- Cards ---------------- */
 .card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: var(--r-md);
   padding: 18px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
   margin-bottom: 12px;
-}
-.card-accent {
-  background: var(--coral-tint);
-  border-color: var(--coral-soft);
 }
 .card-button {
   display: block;
   width: 100%;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.06s ease;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.07s ease;
+}
+.card-button:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: var(--line-2);
 }
 .card-button:active {
-  transform: scale(0.995);
+  transform: scale(0.994);
 }
 .card-label {
-  font-size: 11.5px;
-  letter-spacing: 0.1em;
+  font-size: 11px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--coral);
-  font-weight: 600;
-  margin-bottom: 6px;
+  color: var(--sage);
+  font-weight: 700;
+  margin-bottom: 7px;
 }
 .card-head {
   display: flex;
@@ -255,10 +328,10 @@ button {
 }
 .card-title {
   font-family: var(--serif);
-  font-size: 18px;
+  font-size: 18.5px;
   font-weight: 600;
   margin: 0;
-  line-height: 1.25;
+  line-height: 1.22;
 }
 .card-meta {
   font-size: 12.5px;
@@ -266,17 +339,37 @@ button {
   white-space: nowrap;
 }
 
+/* Kind icon leading a timeline card */
+.card-row {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+}
+.kind-ic {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  margin-top: 2px;
+}
+.kind-ic.visit_note { background: var(--sage-tint); color: #4e7d61; }
+.kind-ic.lab { background: #eee7f4; color: #7a5a86; }
+.kind-ic.scan { background: var(--coral-tint); color: var(--coral-deep); }
+.kind-ic.discharge { background: #f6eddb; color: #a97e34; }
+
 /* ---------------- Next-steps checklist ---------------- */
 .steps {
   list-style: none;
   padding: 0;
-  margin: 12px 0 0;
+  margin: 14px 0 0;
 }
 .step {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: flex-start;
-  padding: 10px 0;
+  padding: 11px 0;
   border-top: 1px solid var(--line);
   font-size: 14.5px;
   line-height: 1.45;
@@ -287,19 +380,19 @@ button {
 }
 .check {
   flex: 0 0 auto;
-  width: 20px;
-  height: 20px;
-  border-radius: 7px;
-  border: 1.5px solid var(--coral-soft);
+  width: 22px;
+  height: 22px;
+  border-radius: 8px;
+  border: 1.5px solid var(--sage);
   display: grid;
   place-items: center;
   margin-top: 1px;
   cursor: pointer;
   background: #fff;
   color: transparent;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.18s ease, border-color 0.18s ease;
 }
 .step.done .check {
   background: var(--good);
@@ -314,9 +407,9 @@ button {
 /* ---------------- Text ---------------- */
 .body-text {
   font-size: 15px;
-  line-height: 1.55;
+  line-height: 1.58;
   color: var(--ink-2);
-  margin: 8px 0 0;
+  margin: 9px 0 0;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -326,13 +419,13 @@ button {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   font-weight: 600;
-  padding: 3px 8px;
+  padding: 3px 9px;
   border-radius: 999px;
   background: var(--paper-2);
   color: var(--ink-2);
 }
 
-/* ---------------- Capture screen ---------------- */
+/* ---------------- Capture screen (meditation-calm) ---------------- */
 .capture {
   flex: 1;
   min-height: 0;
@@ -343,91 +436,112 @@ button {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 24px 24px 32px;
-  gap: 6px;
+  padding: 20px 26px 32px;
+  gap: 4px;
+  background: var(--grad-calm);
 }
 .capture h2 {
   font-family: var(--serif);
-  font-size: 25px;
+  font-size: 26px;
   font-weight: 600;
   margin: 0;
+  letter-spacing: -0.01em;
 }
 .capture .lede {
   color: var(--ink-2);
   font-size: 15px;
-  line-height: 1.5;
-  margin: 4px 0 8px;
-  max-width: 300px;
+  line-height: 1.55;
+  margin: 6px 0 6px;
+  max-width: 290px;
 }
 .consent {
   font-size: 13px;
-  color: var(--ink-3);
-  background: var(--paper-2);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
+  color: var(--ink-2);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 11px 15px;
   max-width: 320px;
+  backdrop-filter: blur(4px);
 }
-.mic {
-  width: 112px;
-  height: 112px;
-  border-radius: 50%;
-  border: none;
-  background: var(--coral);
-  color: #fff;
-  cursor: pointer;
-  box-shadow: 0 10px 30px rgba(232, 131, 107, 0.4);
+
+/* Breathing mic — calm concentric rings */
+.mic-wrap {
+  position: relative;
+  width: 190px;
+  height: 190px;
   display: grid;
   place-items: center;
-  margin: 18px 0 10px;
-  transition: transform 0.12s ease, background 0.2s ease;
+  margin: 14px 0 6px;
+}
+.mic-wrap .ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(232, 146, 124, 0.35);
+}
+.mic-wrap .ring.r1 { width: 190px; height: 190px; }
+.mic-wrap .ring.r2 { width: 152px; height: 152px; }
+.breathing .ring {
+  animation: breathe 4.5s ease-in-out infinite;
+}
+.breathing .ring.r2 { animation-delay: 0.5s; }
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.08); opacity: 0.35; }
+}
+.mic {
+  width: 118px;
+  height: 118px;
+  border-radius: 50%;
+  border: none;
+  background: var(--grad-mic);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 14px 34px rgba(217, 118, 94, 0.42);
+  display: grid;
+  place-items: center;
+  transition: transform 0.14s ease;
+  z-index: 1;
 }
 .mic:active {
   transform: scale(0.96);
 }
 .mic.recording {
-  background: var(--plum);
-  animation: pulse 1.6s ease-out infinite;
-}
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(43, 24, 48, 0.28);
-  }
-  100% {
-    box-shadow: 0 0 0 24px rgba(43, 24, 48, 0);
-  }
+  background: var(--grad-mic-rec);
+  box-shadow: 0 14px 34px rgba(58, 39, 66, 0.4);
 }
 .live-transcript {
   width: 100%;
   text-align: left;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 .transcript-input {
   width: 100%;
-  min-height: 130px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 14px;
+  min-height: 140px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  padding: 15px;
   font-family: var(--sans);
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--ink);
   resize: vertical;
   background: var(--card);
 }
 .transcript-input:focus {
   outline: none;
-  border-color: var(--coral-soft);
+  border-color: var(--coral);
 }
 
 /* ---------------- Buttons ---------------- */
 .btn {
   border: none;
   border-radius: 999px;
-  padding: 13px 20px;
+  padding: 14px 22px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.06s ease;
+  transition: opacity 0.18s ease, transform 0.07s ease, box-shadow 0.18s ease;
 }
 .btn:active {
   transform: scale(0.98);
@@ -440,11 +554,12 @@ button {
 .btn-primary {
   background: var(--plum);
   color: #fff;
+  box-shadow: 0 8px 22px rgba(58, 39, 66, 0.22);
 }
 .btn-ghost {
-  background: transparent;
-  color: var(--coral);
-  border: 1px solid var(--coral-soft);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--coral-deep);
+  border: 1px solid var(--coral-tint);
 }
 .btn-block {
   width: 100%;
@@ -452,7 +567,7 @@ button {
 .btn-row {
   display: flex;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 /* ---------------- Chat ---------------- */
@@ -462,79 +577,92 @@ button {
   gap: 12px;
 }
 .bubble {
-  max-width: 86%;
-  padding: 12px 15px;
-  border-radius: 18px;
+  max-width: 88%;
+  padding: 13px 16px;
+  border-radius: 20px;
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.55;
   overflow-wrap: anywhere;
 }
 .bubble.user {
   align-self: flex-end;
   background: var(--plum);
   color: #fff;
-  border-bottom-right-radius: 6px;
+  border-bottom-right-radius: 7px;
 }
 .bubble.assistant {
   align-self: flex-start;
   background: var(--card);
   border: 1px solid var(--line);
   color: var(--ink);
-  border-bottom-left-radius: 6px;
-  box-shadow: var(--shadow-sm);
+  border-bottom-left-radius: 7px;
+  box-shadow: var(--shadow-xs);
 }
 .sources {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 10px;
+  margin-top: 11px;
 }
 .source-chip {
   font-size: 11.5px;
-  background: var(--coral-tint);
-  color: var(--coral);
-  border: 1px solid var(--coral-soft);
+  background: var(--sage-tint);
+  color: #4e7d61;
+  border: 1px solid #cfe0d3;
   border-radius: 999px;
-  padding: 4px 10px;
+  padding: 4px 11px;
   font-weight: 500;
 }
 .suggestions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 9px;
+  margin-top: 12px;
 }
 .suggestion {
   text-align: left;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  padding: 13px 15px;
   font-size: 14.5px;
   color: var(--ink-2);
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.suggestion::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--coral);
+  flex: 0 0 auto;
 }
 .suggestion:hover {
-  border-color: var(--coral-soft);
+  border-color: var(--coral-tint);
+  box-shadow: var(--shadow-xs);
 }
 
-/* Docked composer: part of the screen, sits above the fixed footer. */
+/* Docked composer */
 .composer {
   flex: 0 0 auto;
-  padding: 10px 14px;
+  padding: 12px 16px;
   display: flex;
   gap: 8px;
   align-items: center;
-  background: var(--paper);
+  background: rgba(246, 244, 239, 0.92);
+  backdrop-filter: blur(12px);
   border-top: 1px solid var(--line);
 }
 .composer input {
   flex: 1;
   min-width: 0;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-2);
   border-radius: 999px;
-  padding: 12px 16px;
+  padding: 13px 17px;
   font-size: 15px;
   font-family: var(--sans);
   background: var(--card);
@@ -542,47 +670,47 @@ button {
 }
 .composer input:focus {
   outline: none;
-  border-color: var(--coral-soft);
+  border-color: var(--coral);
 }
 .composer .send {
   flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   border: none;
-  background: var(--coral);
+  background: var(--grad-mic);
   color: #fff;
   font-size: 18px;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  box-shadow: 0 6px 16px rgba(217, 118, 94, 0.35);
+  transition: opacity 0.18s ease;
 }
 .composer .send:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
+  box-shadow: none;
 }
 
 /* ---------------- Misc ---------------- */
 .hint {
   color: var(--ink-3);
   font-size: 13px;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 .hint.error {
-  color: var(--danger);
+  color: var(--coral-deep);
 }
 .spinner {
   display: inline-block;
   width: 16px;
   height: 16px;
-  border: 2px solid var(--coral-soft);
+  border: 2px solid var(--coral-tint);
   border-top-color: var(--coral);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   vertical-align: middle;
 }
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 .state {
   height: 100%;
@@ -594,14 +722,14 @@ button {
   text-align: center;
   color: var(--ink-3);
   font-size: 14px;
-  padding: 40px 28px;
+  padding: 40px 30px;
 }
 .disclaimer {
   text-align: center;
   font-size: 11.5px;
   color: var(--ink-3);
-  padding: 8px 24px 4px;
-  line-height: 1.4;
+  padding: 10px 24px 4px;
+  line-height: 1.45;
 }
 
 @media (prefers-reduced-motion: reduce) {
