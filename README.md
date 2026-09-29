@@ -21,6 +21,17 @@ From 15+ interviews with patients, survivors, and clinicians, three problems sto
 2. **One patient-owned record** - joins visit notes with labs, scan reports, and discharge summaries in a single timeline the patient owns.
 3. **Ask it anything** - a chat that answers questions grounded *only* in the patient's own record, with citations back to the source document (e.g. "From your Sep 22 visit").
 
+## Demo
+
+A mobile-first web app. The three tabs below run against real local models (Ollama `llama3.1` for the LLM, `faster-whisper` for transcription, `sentence-transformers` for retrieval) - no cloud, no API keys.
+
+| Record | Capture | Ask |
+| :---: | :---: | :---: |
+| ![The unified patient record with filter tabs and the latest visit summary](docs/screens/record.png) | ![Consent-first ambient capture with a live transcript](docs/screens/capture.png) | ![Grounded chat answering from the patient's own record with a source citation](docs/screens/ask.png) |
+| The unified record: visit notes, labs, scans, discharge. | Consent-first ambient capture, then a plain-language summary. | Grounded Q&A that cites the source in your record. |
+
+The answers and summaries shown are real output from `llama3.1` running locally on the seeded demo patient.
+
 ## Architecture
 
 ```

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <clipPath id="frame2"><rect x="0" y="0" width="390" height="844" rx="40"/></clipPath>
+  </defs>
+  <g clip-path="url(#frame2)">
+    <rect width="390" height="844" fill="#faf6f1"/>
+
+    <!-- Header -->
+    <text x="24" y="52" fill="#8a7c8d" font-size="12" font-weight="600" letter-spacing="1.6">AMBIENT VISIT NOTES</text>
+    <text x="24" y="90" fill="#2b1830" font-size="30" font-weight="600" font-family="Fraunces, Georgia, serif">Record</text>
+
+    <!-- Capture body, centered -->
+    <text x="195" y="300" fill="#2b1830" font-size="26" font-weight="600" font-family="Fraunces, Georgia, serif" text-anchor="middle">Capture this visit</text>
+    <text x="195" y="336" fill="#5b4a5e" font-size="15" text-anchor="middle">
+      <tspan x="195" dy="0">With your consent, AI-Scribe listens and turns</tspan>
+      <tspan x="195" dy="21">the visit into plain language you can keep.</tspan>
+    </text>
+
+    <!-- Pulsing mic (recording state) -->
+    <circle cx="195" cy="470" r="86" fill="#2b1830" opacity="0.06"/>
+    <circle cx="195" cy="470" r="72" fill="#2b1830" opacity="0.10"/>
+    <circle cx="195" cy="470" r="58" fill="#2b1830"/>
+    <!-- stop icon -->
+    <rect x="181" y="456" width="28" height="28" rx="7" fill="#fff"/>
+
+    <text x="195" y="576" fill="#8a7c8d" font-size="14" text-anchor="middle">Listening… tap to stop.</text>
+
+    <!-- live transcript preview -->
+    <rect x="30" y="600" width="330" height="96" rx="14" fill="#fffdfb" stroke="#ece2d8"/>
+    <text x="46" y="628" fill="#2b1830" font-size="14">
+      <tspan x="46" dy="0">"…your biopsy results are back, and the</tspan>
+      <tspan x="46" dy="20">next step is to see the surgeon, so please</tspan>
+      <tspan x="46" dy="20">call the surgery office this week to</tspan>
+      <tspan x="46" dy="20">schedule…"</tspan>
+    </text>
+
+    <!-- consent note -->
+    <rect x="55" y="712" width="280" height="40" rx="14" fill="#f3ece3"/>
+    <text x="195" y="737" fill="#8a7c8d" font-size="13" text-anchor="middle">Recording only starts when you tap. Your record stays yours.</text>
+
+    <!-- Bottom tab bar -->
+    <rect x="0" y="768" width="390" height="76" fill="#fffdfb"/>
+    <line x1="0" y1="768" x2="390" y2="768" stroke="#ece2d8"/>
+    <path d="M46 792 l16 -13 l16 13 v19 a1 1 0 0 1 -1 1 h-8 v-12 h-12 v12 h-8 a1 1 0 0 1 -1 -1 z" fill="none" stroke="#8a7c8d" stroke-width="1.8" stroke-linejoin="round"/>
+    <text x="62" y="828" fill="#8a7c8d" font-size="11" text-anchor="middle">Record</text>
+    <!-- Capture (active) -->
+    <rect x="188" y="782" width="12" height="18" rx="6" fill="none" stroke="#2b1830" stroke-width="1.8"/>
+    <path d="M182 794 a12 12 0 0 0 24 0 M194 802 v6" stroke="#2b1830" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <text x="194" y="828" fill="#2b1830" font-size="11" font-weight="600" text-anchor="middle">Capture</text>
+    <path d="M312 784 h20 a4 4 0 0 1 4 4 v12 a4 4 0 0 1 -4 4 h-14 l-6 6 v-6 a4 4 0 0 1 -4 -4 v-12 a4 4 0 0 1 4 -4 z" fill="none" stroke="#8a7c8d" stroke-width="1.8" stroke-linejoin="round"/>
+    <text x="326" y="828" fill="#8a7c8d" font-size="11" text-anchor="middle">Ask</text>
+  </g>
+  <rect x="0.5" y="0.5" width="389" height="843" rx="40" fill="none" stroke="#e6dccf"/>
+</svg>
