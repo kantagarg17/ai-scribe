@@ -4,18 +4,28 @@ node_modules/
 venv/
 __pycache__/
 *.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
 
 # Environment / secrets
 .env
 .env.*
 !.env.example
 
+# App data (local patient record store + uploads)
+backend/data/
+backend/*.db
+backend/uploads/
+
 # Build output
 dist/
 build/
 *.log
+*.tsbuildinfo
 
 # OS / editor
 .DS_Store
 .idea/
+.vscode/
 *.swp

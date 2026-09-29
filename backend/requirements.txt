@@ -1,0 +1,25 @@
+# Web framework
+fastapi>=0.115,<0.116
+uvicorn[standard]>=0.32,<0.33
+python-multipart>=0.0.17
+pydantic>=2.10,<3
+pydantic-settings>=2.6,<3
+
+# Storage
+sqlmodel>=0.0.22
+
+# HTTP client for OpenAI-compatible providers
+httpx>=0.28,<0.29
+
+# Numerical (embeddings similarity)
+numpy>=2.1
+
+# Testing
+pytest>=8.3
+
+# --- Optional local/open-source model backends ---
+# Install these to run fully on-device. They are imported lazily, so the
+# app still starts without them (using OpenAI-compatible providers instead).
+#
+# faster-whisper>=1.1.0            # local transcription
+# sentence-transformers>=3.3.1     # local embeddings
