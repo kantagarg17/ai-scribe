@@ -3,11 +3,11 @@ visit notes) and read the full timeline.
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlmodel import Session, select
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from sqlmodel import Session, delete, select
 
 from ..db import get_session
-from ..models import Document, DocumentKind, Patient
+from ..models import Chunk, Document, DocumentKind, Patient, VisitSummary
 from ..schemas import DocumentCreate, DocumentOut
 from ..services.ingestion import index_document
 
@@ -73,3 +73,26 @@ def get_document(
     if not doc or doc.patient_id != patient_id:
         raise HTTPException(status_code=404, detail="Document not found")
     return _to_out(doc)
+
+
+@router.delete("/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_document(
+    patient_id: int,
+    document_id: int,
+    session: Session = Depends(get_session),
+) -> Response:
+    """Delete a record and everything derived from it.
+
+    Removes the document plus any visit summary and all retrieval chunks, so a
+    note captured by accident leaves nothing behind in the patient's record or
+    in grounded chat.
+    """
+    doc = session.get(Document, document_id)
+    if not doc or doc.patient_id != patient_id:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    session.exec(delete(Chunk).where(Chunk.document_id == document_id))
+    session.exec(delete(VisitSummary).where(VisitSummary.document_id == document_id))
+    session.delete(doc)
+    session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -18,7 +18,7 @@ From 15+ interviews with patients, survivors, and clinicians, three problems sto
 ## What it does
 
 1. **Ambient visit notes** - with consent, records a visit, transcribes it, and writes a plain-language summary, clear next steps, and a shareable caregiver update.
-2. **One patient-owned record** - joins visit notes with labs, scan reports, and discharge summaries in a single timeline the patient owns.
+2. **One patient-owned record** - joins visit notes with labs, scan reports, and discharge summaries in a single timeline the patient owns. Swipe a record left to delete it (with confirmation) if it was captured by accident - the note, its summary, and its retrieval data are all removed.
 3. **Ask it anything** - a chat that answers questions grounded *only* in the patient's own record, with citations back to the source document (e.g. "From your Sep 22 visit").
 
 ## Demo

@@ -69,6 +69,15 @@ export const api = {
     return json(await fetch(`/api/patients/${patientId}/visits`));
   },
 
+  async deleteDocument(patientId: number, documentId: number): Promise<void> {
+    const res = await fetch(`/api/patients/${patientId}/documents/${documentId}`, {
+      method: "DELETE",
+    });
+    if (!res.ok && res.status !== 204) {
+      throw new Error(`Failed to delete (${res.status})`);
+    }
+  },
+
   async recordTranscript(
     patientId: number,
     payload: { transcript: string; title?: string; doc_date: string }

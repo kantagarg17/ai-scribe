@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, DocumentItem, DocumentKind, VisitSummary } from "../api";
 import { IconVisit, IconLab, IconScan, IconDischarge } from "../icons";
+import SwipeCard from "../SwipeCard";
 
 type Filter = "all" | DocumentKind;
 
@@ -59,6 +60,23 @@ export default function Home({ patientId }: { patientId: number }) {
       alive = false;
     };
   }, [patientId]);
+
+  async function handleDelete(doc: DocumentItem) {
+    // Optimistically remove from the timeline and any visit summary.
+    setDocs((prev) => prev.filter((d) => d.id !== doc.id));
+    setVisits((prev) => prev.filter((v) => v.document_id !== doc.id));
+    try {
+      await api.deleteDocument(patientId, doc.id);
+    } catch {
+      // Reload from source on failure so the UI stays truthful.
+      const [d, v] = await Promise.all([
+        api.listDocuments(patientId),
+        api.listVisits(patientId),
+      ]);
+      setDocs(d);
+      setVisits(v);
+    }
+  }
 
   const latestVisit = visits[0];
   const shown = docs.filter((d) => filter === "all" || d.kind === filter);
@@ -125,31 +143,32 @@ export default function Home({ patientId }: { patientId: number }) {
                   <span className="rule" />
                 </div>
                 {g.items.map((d) => (
-                  <button
-                    key={d.id}
-                    className="card card-button"
-                    onClick={() => setOpen(open === d.id ? null : d.id)}
-                  >
-                    <div className="card-row">
-                      <span className={`kind-ic ${d.kind}`}>
-                        <KindIcon kind={d.kind} />
-                      </span>
-                      <div style={{ minWidth: 0, flex: 1 }}>
-                        <div className="card-head">
-                          <span className="kind-badge">{KIND_LABEL[d.kind]}</span>
-                          <span className="card-meta">{d.doc_date}</span>
+                  <SwipeCard key={d.id} onDelete={() => handleDelete(d)}>
+                    <button
+                      className="card card-button"
+                      onClick={() => setOpen(open === d.id ? null : d.id)}
+                    >
+                      <div className="card-row">
+                        <span className={`kind-ic ${d.kind}`}>
+                          <KindIcon kind={d.kind} />
+                        </span>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div className="card-head">
+                            <span className="kind-badge">{KIND_LABEL[d.kind]}</span>
+                            <span className="card-meta">{d.doc_date}</span>
+                          </div>
+                          <h3 className="card-title" style={{ marginTop: 8 }}>
+                            {d.title}
+                          </h3>
+                          <p className="body-text">
+                            {open === d.id
+                              ? d.content
+                              : d.content.slice(0, 96).trim() + (d.content.length > 96 ? "…" : "")}
+                          </p>
                         </div>
-                        <h3 className="card-title" style={{ marginTop: 8 }}>
-                          {d.title}
-                        </h3>
-                        <p className="body-text">
-                          {open === d.id
-                            ? d.content
-                            : d.content.slice(0, 96).trim() + (d.content.length > 96 ? "…" : "")}
-                        </p>
                       </div>
-                    </div>
-                  </button>
+                    </button>
+                  </SwipeCard>
                 ))}
               </div>
             ))}

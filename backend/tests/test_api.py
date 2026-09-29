@@ -89,3 +89,44 @@ def test_chat_without_record_declines_gracefully(client):
     ).json()
     assert body["sources"] == []
     assert "record" in body["answer"].lower()
+
+
+def test_delete_document_removes_it_from_record_and_chat(client):
+    pid = _make_patient(client)
+    # A visit note produces a document, a summary, and retrieval chunks.
+    created = client.post(
+        f"/api/patients/{pid}/visits/transcript",
+        json={
+            "transcript": "Doctor: Call the oncology line for any fever over 100.4.",
+            "title": "Accidental recording",
+            "doc_date": "2025-09-22",
+        },
+    ).json()
+    doc_id = created["document_id"]
+
+    # It's retrievable before deletion.
+    before = client.post(
+        f"/api/patients/{pid}/chat", json={"question": "fever"}
+    ).json()
+    assert any(s["document_id"] == doc_id for s in before["sources"])
+
+    # Delete it.
+    resp = client.delete(f"/api/patients/{pid}/documents/{doc_id}")
+    assert resp.status_code == 204
+
+    # Gone from the record and from visits.
+    docs = client.get(f"/api/patients/{pid}/documents").json()
+    assert all(d["id"] != doc_id for d in docs)
+    visits = client.get(f"/api/patients/{pid}/visits").json()
+    assert all(v["document_id"] != doc_id for v in visits)
+
+    # And no longer cited by chat (its chunks are gone).
+    after = client.post(
+        f"/api/patients/{pid}/chat", json={"question": "fever"}
+    ).json()
+    assert all(s["document_id"] != doc_id for s in after["sources"])
+
+
+def test_delete_missing_document_returns_404(client):
+    pid = _make_patient(client)
+    assert client.delete(f"/api/patients/{pid}/documents/99999").status_code == 404
