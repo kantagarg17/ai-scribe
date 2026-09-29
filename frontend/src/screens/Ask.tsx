@@ -18,10 +18,10 @@ export default function Ask({ patientId }: { patientId: number }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const streamRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    streamRef.current?.scrollTo({ top: streamRef.current.scrollHeight, behavior: "smooth" });
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [turns, busy]);
 
   async function send(question: string) {
@@ -34,15 +34,18 @@ export default function Ask({ patientId }: { patientId: number }) {
       const res = await api.ask(patientId, q);
       setTurns((t) => [...t, { role: "assistant", text: res.answer, sources: res.sources }]);
     } catch (e) {
-      setTurns((t) => [...t, { role: "assistant", text: "Sorry, something went wrong: " + (e as Error).message }]);
+      setTurns((t) => [
+        ...t,
+        { role: "assistant", text: "Sorry, something went wrong: " + (e as Error).message },
+      ]);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <>
-      <div className="content" ref={streamRef}>
+    <div className="screen">
+      <div className="scroll" ref={scrollRef}>
         {turns.length === 0 && (
           <>
             <div className="card">
@@ -62,27 +65,29 @@ export default function Ask({ patientId }: { patientId: number }) {
           </>
         )}
 
-        <div className="chat-stream">
-          {turns.map((t, i) => (
-            <div key={i} className={`bubble ${t.role}`}>
-              {t.text}
-              {t.sources && t.sources.length > 0 && (
-                <div className="sources">
-                  {t.sources.map((s) => (
-                    <span className="source-chip" key={s.document_id}>
-                      From your {s.title} · {s.doc_date}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-          {busy && (
-            <div className="bubble assistant">
-              <span className="spinner" /> Looking through your record…
-            </div>
-          )}
-        </div>
+        {turns.length > 0 && (
+          <div className="chat-stream">
+            {turns.map((t, i) => (
+              <div key={i} className={`bubble ${t.role}`}>
+                {t.text}
+                {t.sources && t.sources.length > 0 && (
+                  <div className="sources">
+                    {t.sources.map((s) => (
+                      <span className="source-chip" key={s.document_id}>
+                        From your {s.title} · {s.doc_date}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            {busy && (
+              <div className="bubble assistant">
+                <span className="spinner" /> Looking through your record…
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="composer">
@@ -96,6 +101,6 @@ export default function Ask({ patientId }: { patientId: number }) {
           ↑
         </button>
       </div>
-    </>
+    </div>
   );
 }

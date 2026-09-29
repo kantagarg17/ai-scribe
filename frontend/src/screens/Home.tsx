@@ -44,12 +44,12 @@ export default function Home({ patientId }: { patientId: number }) {
   const shown = docs.filter((d) => filter === "all" || d.kind === filter);
 
   return (
-    <>
-      <div className="tabs">
+    <div className="screen">
+      <div className="subbar">
         {FILTERS.map((f) => (
           <button
             key={f.key}
-            className={`tab ${filter === f.key ? "active" : ""}`}
+            className={`chip ${filter === f.key ? "active" : ""}`}
             onClick={() => setFilter(f.key)}
           >
             {f.label}
@@ -57,55 +57,61 @@ export default function Home({ patientId }: { patientId: number }) {
         ))}
       </div>
 
-      <div className="content">
-        {loading && <div className="center-muted"><span className="spinner" /> Loading your record…</div>}
-
-        {!loading && filter === "all" && latestVisit && (
-          <div className="card card-accent">
-            <div className="card-label">Latest visit summary</div>
-            <h3 className="card-title">{latestVisit.title}</h3>
-            <div className="card-meta">
-              {latestVisit.doc_date} · {latestVisit.next_steps.length} next steps
-            </div>
-            <p className="body-text">{latestVisit.summary}</p>
-            {latestVisit.next_steps.length > 0 && (
-              <ul className="steps">
-                {latestVisit.next_steps.map((s, i) => (
-                  <li className="step" key={i}>
-                    <span className="check">✓</span>
-                    <span>{s}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+      <div className="scroll">
+        {loading ? (
+          <div className="state">
+            <span className="spinner" /> Loading your record…
           </div>
-        )}
-
-        {!loading && shown.length === 0 && (
-          <div className="center-muted">Nothing here yet. Capture a visit or add a record.</div>
-        )}
-
-        {!loading &&
-          shown.map((d) => (
-            <button
-              key={d.id}
-              className="card"
-              style={{ display: "block", width: "100%", textAlign: "left", cursor: "pointer" }}
-              onClick={() => setOpen(open === d.id ? null : d.id)}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span className="kind-badge">{KIND_LABEL[d.kind]}</span>
-                <span className="card-meta">{d.doc_date}</span>
+        ) : (
+          <>
+            {filter === "all" && latestVisit && (
+              <div className="card card-accent">
+                <div className="card-label">Latest visit summary</div>
+                <h3 className="card-title">{latestVisit.title}</h3>
+                <div className="card-meta" style={{ marginTop: 4 }}>
+                  {latestVisit.doc_date} · {latestVisit.next_steps.length} next steps
+                </div>
+                <p className="body-text">{latestVisit.summary}</p>
+                {latestVisit.next_steps.length > 0 && (
+                  <ul className="steps">
+                    {latestVisit.next_steps.map((s, i) => (
+                      <li className="step" key={i}>
+                        <span className="check">✓</span>
+                        <span className="step-text">{s}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
-              <h3 className="card-title" style={{ marginTop: 8 }}>
-                {d.title}
-              </h3>
-              <p className="body-text" style={{ marginTop: 6 }}>
-                {open === d.id ? d.content : d.content.slice(0, 120).trim() + (d.content.length > 120 ? "…" : "")}
-              </p>
-            </button>
-          ))}
+            )}
+
+            {shown.length === 0 && (
+              <div className="state">Nothing here yet. Capture a visit or add a record.</div>
+            )}
+
+            {shown.map((d) => (
+              <button
+                key={d.id}
+                className="card card-button"
+                onClick={() => setOpen(open === d.id ? null : d.id)}
+              >
+                <div className="card-head">
+                  <span className="kind-badge">{KIND_LABEL[d.kind]}</span>
+                  <span className="card-meta">{d.doc_date}</span>
+                </div>
+                <h3 className="card-title" style={{ marginTop: 8 }}>
+                  {d.title}
+                </h3>
+                <p className="body-text">
+                  {open === d.id
+                    ? d.content
+                    : d.content.slice(0, 120).trim() + (d.content.length > 120 ? "…" : "")}
+                </p>
+              </button>
+            ))}
+          </>
+        )}
       </div>
-    </>
+    </div>
   );
 }

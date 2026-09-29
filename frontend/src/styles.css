@@ -12,11 +12,19 @@
   --coral-tint: #fbeae4;
   --line: #ece2d8;
   --good: #4c9a72;
-  --shadow: 0 1px 2px rgba(43, 24, 48, 0.04), 0 8px 24px rgba(43, 24, 48, 0.06);
+  --danger: #b4573f;
+  --shadow-sm: 0 1px 2px rgba(43, 24, 48, 0.04), 0 4px 14px rgba(43, 24, 48, 0.05);
+  --shadow-lg: 0 20px 60px rgba(43, 24, 48, 0.18);
   --radius: 20px;
   --radius-sm: 14px;
   --serif: "Fraunces", Georgia, serif;
   --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Fixed layout rails so proportions never shift with content. */
+  --header-h: 76px;
+  --footer-h: 64px;
+  --bar-h: 56px;
+  --maxw: 440px;
 }
 
 * {
@@ -27,55 +35,71 @@ html,
 body {
   margin: 0;
   padding: 0;
+  height: 100%;
   background: var(--paper-2);
   font-family: var(--sans);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font-family: inherit;
 }
 
 #root {
-  min-height: 100vh;
+  height: 100%;
 }
 
-/* --- Phone frame: the app is a mobile webapp, centered on larger screens --- */
+/* ============================================================
+   App shell: a stable grid. The frame is ALWAYS
+   [header | scrollable main | footer]. Content only ever
+   changes the middle row; the grid tracks never move, so
+   proportions stay fixed on scroll, tab switch, or resize.
+   ============================================================ */
+.app {
+  height: 100dvh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background: var(--paper-2);
+}
+
 .device {
-  max-width: 430px;
-  margin: 0 auto;
-  /* Fixed viewport height so the inner .content is what scrolls, between a
-     fixed header and a fixed bottom bar. dvh handles mobile browser chrome. */
-  height: 100vh;
+  width: 100%;
+  max-width: var(--maxw);
   height: 100dvh;
   background: var(--paper);
-  position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: var(--header-h) 1fr var(--footer-h);
   overflow: hidden;
-  box-shadow: 0 0 60px rgba(43, 24, 48, 0.12);
+  position: relative;
 }
 
-@media (min-width: 480px) {
-  body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
+/* Desktop / tablet: center a phone-like card with a soft page backdrop. */
+@media (min-width: 600px) {
+  .app {
+    padding: 24px;
   }
   .device {
-    /* On desktop, cap to a realistic phone size and center it. */
-    height: 860px;
-    max-height: calc(100vh - 48px);
-    margin: 0 auto;
-    border-radius: 34px;
+    height: min(920px, calc(100dvh - 48px));
+    border-radius: 32px;
     border: 1px solid var(--line);
+    box-shadow: var(--shadow-lg);
   }
 }
 
-/* --- Header --- */
+/* ---------------- Header (fixed grid row) ---------------- */
 .header {
-  padding: 22px 22px 12px;
+  padding: 16px 20px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
 }
 .eyebrow {
-  font-size: 12px;
+  font-size: 11.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-3);
@@ -83,97 +107,179 @@ body {
 }
 .greeting {
   font-family: var(--serif);
-  font-size: 30px;
+  font-size: 27px;
   font-weight: 600;
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   letter-spacing: -0.01em;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* --- Scrollable content area --- */
-.content {
-  flex: 1 1 auto;
-  min-height: 0; /* allow the flex child to shrink so it scrolls, not grows */
+/* ---------------- Main (the ONLY scroll container) ----------------
+   Every screen renders a .screen inside this row. The screen owns its
+   own layout (optional sticky sub-bar + scroll area + optional docked
+   composer), but the grid row height is fixed by the shell. */
+.main {
+  min-height: 0; /* critical: lets the grid row scroll instead of grow */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* A scrollable body used by every screen. */
+.scroll {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 4px 18px 24px;
+  overscroll-behavior: contain;
+  padding: 8px 16px 20px;
+}
+.scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 8px;
 }
 
-/* --- Cards --- */
+/* ---------------- Footer nav (fixed grid row) ---------------- */
+.tabbar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--card);
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tabbar button {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--ink-3);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.tabbar button.active {
+  color: var(--plum);
+}
+.tabbar .ic {
+  display: grid;
+  place-items: center;
+  height: 24px;
+}
+
+/* ---------------- Sticky sub-bar (filter chips) ---------------- */
+.subbar {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  padding: 4px 16px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid transparent;
+}
+.subbar::-webkit-scrollbar {
+  display: none;
+}
+.chip {
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink-2);
+  border-radius: 999px;
+  padding: 8px 15px;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+.chip.active {
+  background: var(--plum);
+  color: #fff;
+  border-color: var(--plum);
+}
+
+/* ---------------- Cards ---------------- */
 .card {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 18px;
-  box-shadow: var(--shadow);
-  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 12px;
 }
 .card-accent {
   background: var(--coral-tint);
   border-color: var(--coral-soft);
 }
-
+.card-button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.06s ease;
+}
+.card-button:active {
+  transform: scale(0.995);
+}
 .card-label {
-  font-size: 12px;
+  font-size: 11.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--coral);
   font-weight: 600;
   margin-bottom: 6px;
 }
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
 .card-title {
   font-family: var(--serif);
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 600;
-  margin: 0 0 2px;
+  margin: 0;
+  line-height: 1.25;
 }
 .card-meta {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--ink-3);
+  white-space: nowrap;
 }
 
-/* --- Tabs (record filters) --- */
-.tabs {
-  display: flex;
-  gap: 8px;
-  padding: 4px 18px 14px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.tabs::-webkit-scrollbar {
-  display: none;
-}
-.tab {
-  flex: 0 0 auto;
-  border: 1px solid var(--line);
-  background: var(--card);
-  color: var(--ink-2);
-  border-radius: 999px;
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.tab.active {
-  background: var(--plum);
-  color: #fff;
-  border-color: var(--plum);
-}
-
-/* --- Next steps checklist --- */
+/* ---------------- Next-steps checklist ---------------- */
 .steps {
   list-style: none;
   padding: 0;
-  margin: 10px 0 0;
+  margin: 12px 0 0;
 }
 .step {
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  padding: 9px 0;
+  padding: 10px 0;
   border-top: 1px solid var(--line);
-  font-size: 15px;
-  line-height: 1.4;
+  font-size: 14.5px;
+  line-height: 1.45;
   color: var(--ink-2);
 }
 .step:first-child {
@@ -191,63 +297,44 @@ body {
   cursor: pointer;
   background: #fff;
   color: transparent;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 .step.done .check {
   background: var(--good);
   border-color: var(--good);
   color: #fff;
 }
-.step.done span {
+.step.done .step-text {
   color: var(--ink-3);
   text-decoration: line-through;
 }
 
-/* --- Body text --- */
+/* ---------------- Text ---------------- */
 .body-text {
-  font-size: 15.5px;
+  font-size: 15px;
   line-height: 1.55;
   color: var(--ink-2);
   margin: 8px 0 0;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.kind-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  color: var(--ink-2);
 }
 
-/* --- Bottom tab bar (fixed flex sibling, not absolute) --- */
-.tabbar {
-  flex: 0 0 auto;
-  display: flex;
-  background: rgba(255, 253, 251, 0.92);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid var(--line);
-  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
-}
-.tabbar button {
-  flex: 1;
-  background: none;
-  border: none;
-  padding: 8px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  color: var(--ink-3);
-  font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: var(--sans);
-}
-.tabbar button.active {
-  color: var(--plum);
-}
-.tabbar .ic {
-  font-size: 20px;
-  line-height: 1;
-}
-
-/* --- Capture screen (Wispr-inspired) --- */
+/* ---------------- Capture screen ---------------- */
 .capture {
-  flex: 1 1 auto;
+  flex: 1;
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -256,20 +343,20 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 32px 28px 28px;
-  gap: 8px;
+  padding: 24px 24px 32px;
+  gap: 6px;
 }
 .capture h2 {
   font-family: var(--serif);
-  font-size: 26px;
+  font-size: 25px;
   font-weight: 600;
   margin: 0;
 }
-.capture p {
+.capture .lede {
   color: var(--ink-2);
   font-size: 15px;
   line-height: 1.5;
-  margin: 0 0 8px;
+  margin: 4px 0 8px;
   max-width: 300px;
 }
 .consent {
@@ -281,19 +368,18 @@ body {
   max-width: 320px;
 }
 .mic {
-  width: 116px;
-  height: 116px;
+  width: 112px;
+  height: 112px;
   border-radius: 50%;
   border: none;
   background: var(--coral);
   color: #fff;
-  font-size: 44px;
   cursor: pointer;
   box-shadow: 0 10px 30px rgba(232, 131, 107, 0.4);
   display: grid;
   place-items: center;
-  margin: 12px 0;
-  transition: transform 0.12s ease;
+  margin: 18px 0 10px;
+  transition: transform 0.12s ease, background 0.2s ease;
 }
 .mic:active {
   transform: scale(0.96);
@@ -307,10 +393,9 @@ body {
     box-shadow: 0 0 0 0 rgba(43, 24, 48, 0.28);
   }
   100% {
-    box-shadow: 0 0 0 26px rgba(43, 24, 48, 0);
+    box-shadow: 0 0 0 24px rgba(43, 24, 48, 0);
   }
 }
-
 .live-transcript {
   width: 100%;
   text-align: left;
@@ -334,20 +419,23 @@ body {
   border-color: var(--coral-soft);
 }
 
-/* --- Buttons --- */
+/* ---------------- Buttons ---------------- */
 .btn {
   border: none;
   border-radius: 999px;
-  padding: 14px 22px;
+  padding: 13px 20px;
   font-size: 15px;
   font-weight: 600;
-  font-family: var(--sans);
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.15s ease, transform 0.06s ease;
+}
+.btn:active {
+  transform: scale(0.98);
 }
 .btn:disabled {
   opacity: 0.5;
   cursor: default;
+  transform: none;
 }
 .btn-primary {
   background: var(--plum);
@@ -361,20 +449,25 @@ body {
 .btn-block {
   width: 100%;
 }
+.btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
 
-/* --- Chat (Ask it anything) --- */
+/* ---------------- Chat ---------------- */
 .chat-stream {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-bottom: 8px;
 }
 .bubble {
-  max-width: 84%;
+  max-width: 86%;
   padding: 12px 15px;
   border-radius: 18px;
   font-size: 15px;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 .bubble.user {
   align-self: flex-end;
@@ -388,15 +481,16 @@ body {
   border: 1px solid var(--line);
   color: var(--ink);
   border-bottom-left-radius: 6px;
+  box-shadow: var(--shadow-sm);
 }
 .sources {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 .source-chip {
-  font-size: 12px;
+  font-size: 11.5px;
   background: var(--coral-tint);
   color: var(--coral);
   border: 1px solid var(--coral-soft);
@@ -404,18 +498,40 @@ body {
   padding: 4px 10px;
   font-weight: 500;
 }
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+.suggestion {
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 14.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.suggestion:hover {
+  border-color: var(--coral-soft);
+}
 
+/* Docked composer: part of the screen, sits above the fixed footer. */
 .composer {
   flex: 0 0 auto;
-  padding: 10px 16px;
+  padding: 10px 14px;
   display: flex;
   gap: 8px;
-  background: rgba(250, 246, 241, 0.94);
-  backdrop-filter: blur(12px);
+  align-items: center;
+  background: var(--paper);
   border-top: 1px solid var(--line);
 }
 .composer input {
   flex: 1;
+  min-width: 0;
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 12px 16px;
@@ -430,55 +546,28 @@ body {
 }
 .composer .send {
   flex: 0 0 auto;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: none;
   background: var(--coral);
   color: #fff;
   font-size: 18px;
   cursor: pointer;
+  transition: opacity 0.15s ease;
 }
 .composer .send:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
-.suggestions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 6px;
-}
-.suggestion {
-  text-align: left;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  font-size: 14.5px;
-  color: var(--ink-2);
-  cursor: pointer;
-}
-.suggestion:hover {
-  border-color: var(--coral-soft);
-}
-
-/* --- Misc --- */
+/* ---------------- Misc ---------------- */
 .hint {
   color: var(--ink-3);
   font-size: 13px;
   margin-top: 4px;
 }
-.kind-badge {
-  display: inline-block;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: var(--paper-2);
-  color: var(--ink-2);
+.hint.error {
+  color: var(--danger);
 }
 .spinner {
   display: inline-block;
@@ -495,16 +584,29 @@ body {
     transform: rotate(360deg);
   }
 }
-.center-muted {
+.state {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   text-align: center;
   color: var(--ink-3);
   font-size: 14px;
-  padding: 40px 20px;
+  padding: 40px 28px;
 }
 .disclaimer {
   text-align: center;
   font-size: 11.5px;
   color: var(--ink-3);
-  padding: 4px 24px 12px;
+  padding: 8px 24px 4px;
   line-height: 1.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }
