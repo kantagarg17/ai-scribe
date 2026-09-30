@@ -41,6 +41,7 @@ jobs:
       - name: Build (demo mode)
         env:
           VITE_DEMO: "1"
+          VITE_BASE: "/ai-scribe/"
         run: npm run build
 
       - name: SPA fallback (404 -> index)

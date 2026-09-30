@@ -1,0 +1,21 @@
+# Netlify configuration for the static AI-Scribe demo.
+#
+# Builds the frontend in demo mode (bundled sample data, no backend, no model,
+# no secrets) and serves it at the site root. SPA routes fall back to index.html.
+
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Use the bundled demo data instead of a backend. Base path stays "/" (root)
+  # because Netlify serves the site at the domain root.
+  VITE_DEMO = "1"
+
+# Single-page app: serve index.html for any unmatched path.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
