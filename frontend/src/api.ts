@@ -51,7 +51,25 @@ async function json<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export const api = {
+export interface AiScribeApi {
+  listPatients(): Promise<Patient[]>;
+  getPatient(id: number): Promise<Patient>;
+  listDocuments(patientId: number, kind?: DocumentKind): Promise<DocumentItem[]>;
+  listVisits(patientId: number): Promise<VisitSummary[]>;
+  deleteDocument(patientId: number, documentId: number): Promise<void>;
+  recordTranscript(
+    patientId: number,
+    payload: { transcript: string; title?: string; doc_date: string }
+  ): Promise<VisitSummary>;
+  recordAudio(
+    patientId: number,
+    audio: Blob,
+    meta: { title?: string; doc_date: string }
+  ): Promise<VisitSummary>;
+  ask(patientId: number, question: string): Promise<ChatResponse>;
+}
+
+const liveApi: AiScribeApi = {
   async listPatients(): Promise<Patient[]> {
     return json(await fetch("/api/patients"));
   },
@@ -118,3 +136,9 @@ export const api = {
     );
   },
 };
+
+// In the static GitHub Pages build there is no backend, so use the bundled
+// demo adapter. Local dev and self-hosted builds use the live HTTP API.
+import { demoApi, IS_DEMO } from "./demo";
+
+export const api: AiScribeApi = IS_DEMO ? demoApi : liveApi;

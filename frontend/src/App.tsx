@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, Patient } from "./api";
+import { IS_DEMO } from "./demo";
 import { IconChat, IconHome, IconMic } from "./icons";
 import Home from "./screens/Home";
 import Record from "./screens/Record";
@@ -49,6 +50,11 @@ export default function App() {
         <header className="header">
           <div className="eyebrow">{header.eyebrow}</div>
           <h1 className="greeting">{header.title(patient)}</h1>
+          {IS_DEMO && (
+            <div className="demo-banner">
+              Demo · answers come from the sample record, not a live AI model
+            </div>
+          )}
         </header>
 
         <main className="main">
