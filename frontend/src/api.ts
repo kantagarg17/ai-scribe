@@ -64,7 +64,7 @@ export interface AiScribeApi {
   recordAudio(
     patientId: number,
     audio: Blob,
-    meta: { title?: string; doc_date: string }
+    meta: { title?: string; doc_date: string; filename?: string }
   ): Promise<VisitSummary>;
   ask(patientId: number, question: string): Promise<ChatResponse>;
 }
@@ -118,10 +118,10 @@ const liveApi: AiScribeApi = {
   async recordAudio(
     patientId: number,
     audio: Blob,
-    meta: { title?: string; doc_date: string }
+    meta: { title?: string; doc_date: string; filename?: string }
   ): Promise<VisitSummary> {
     const form = new FormData();
-    form.append("audio", audio, "visit.webm");
+    form.append("audio", audio, meta.filename || "visit.webm");
     if (meta.title) form.append("title", meta.title);
     form.append("doc_date", meta.doc_date);
     return json(
@@ -143,8 +143,78 @@ const liveApi: AiScribeApi = {
   },
 };
 
-// In the static GitHub Pages build there is no backend, so use the bundled
-// demo adapter. Local dev and self-hosted builds use the live HTTP API.
+// In the static demo there is no backend, so use the bundled demo adapter.
+// Hosted (Netlify Function) and local dev use the live HTTP API.
 import { demoApi, IS_DEMO } from "./demo";
 
-export const api: AiScribeApi = IS_DEMO ? demoApi : liveApi;
+const base: AiScribeApi = IS_DEMO ? demoApi : liveApi;
+
+// ---------------------------------------------------------------------------
+// Response cache — makes AI feel seamless.
+//
+// Chat answers are deterministic enough to reuse: the same question on the
+// same record returns the same answer, so we memoize by normalized question
+// and persist to localStorage. Repeat questions (and the suggested prompts,
+// which we prime on load) return instantly instead of waiting on the model.
+// ---------------------------------------------------------------------------
+const CACHE_KEY = "aiscribe.chat.v1";
+
+function loadCache(): Record<string, ChatResponse> {
+  try {
+    return JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveCache(c: Record<string, ChatResponse>): void {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(c));
+  } catch {
+    /* storage full or unavailable — ignore, cache stays in-memory */
+  }
+}
+
+const chatCache: Record<string, ChatResponse> = loadCache();
+const inflight = new Map<string, Promise<ChatResponse>>();
+const norm = (q: string) => q.trim().toLowerCase().replace(/\s+/g, " ");
+
+const cachedApi: AiScribeApi = {
+  ...base,
+  async ask(patientId: number, question: string): Promise<ChatResponse> {
+    const key = norm(question);
+    const hit = chatCache[key];
+    if (hit) return hit;
+    // De-dupe concurrent identical asks (e.g. priming + a fast click).
+    const pending = inflight.get(key);
+    if (pending) return pending;
+
+    const p = base
+      .ask(patientId, question)
+      .then((res) => {
+        chatCache[key] = res;
+        saveCache(chatCache);
+        inflight.delete(key);
+        return res;
+      })
+      .catch((err) => {
+        inflight.delete(key);
+        throw err;
+      });
+    inflight.set(key, p);
+    return p;
+  },
+};
+
+export const api: AiScribeApi = cachedApi;
+
+/** Warm the cache for a set of questions in the background (fire-and-forget). */
+export function primeChat(patientId: number, questions: string[]): void {
+  for (const q of questions) {
+    const key = norm(q);
+    if (!chatCache[key] && !inflight.get(key)) {
+      // Ignore errors while priming; a real ask will surface them.
+      api.ask(patientId, q).catch(() => {});
+    }
+  }
+}

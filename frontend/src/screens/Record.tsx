@@ -26,19 +26,50 @@ export default function Record({
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const mimeRef = useRef<string>("audio/webm");
 
   const today = new Date().toISOString().slice(0, 10);
+
+  // Pick a container the browser can record AND Groq Whisper accepts. Chrome/
+  // Firefox produce webm/ogg; Safari produces mp4/m4a. Hardcoding webm broke
+  // Safari, so negotiate here.
+  function pickMimeType(): string {
+    const candidates = [
+      "audio/webm;codecs=opus",
+      "audio/webm",
+      "audio/ogg;codecs=opus",
+      "audio/mp4",
+      "audio/mpeg",
+    ];
+    const MR = (window as any).MediaRecorder;
+    if (MR && typeof MR.isTypeSupported === "function") {
+      for (const c of candidates) if (MR.isTypeSupported(c)) return c;
+    }
+    return "";
+  }
+
+  function extFor(mime: string): string {
+    if (mime.includes("webm")) return "webm";
+    if (mime.includes("ogg")) return "ogg";
+    if (mime.includes("mp4")) return "m4a";
+    if (mime.includes("mpeg")) return "mp3";
+    return "webm";
+  }
 
   async function startRecording() {
     setError("");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+      const chosen = pickMimeType();
+      const recorder = chosen ? new MediaRecorder(stream, { mimeType: chosen }) : new MediaRecorder(stream);
+      // The actual type the recorder settled on (may differ from requested).
+      mimeRef.current = recorder.mimeType || chosen || "audio/webm";
       chunksRef.current = [];
       recorder.ondataavailable = (e) => e.data.size && chunksRef.current.push(e.data);
       recorder.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop());
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+        const type = (mimeRef.current || "audio/webm").split(";")[0];
+        const blob = new Blob(chunksRef.current, { type });
         await processAudio(blob);
       };
       recorder.start();
@@ -59,16 +90,18 @@ export default function Record({
   async function processAudio(blob: Blob) {
     setPhase("processing");
     try {
-      const v = await api.recordAudio(patientId, blob, { title: "Clinic visit", doc_date: today });
+      const ext = extFor(mimeRef.current);
+      const v = await api.recordAudio(patientId, blob, {
+        title: "Clinic visit",
+        doc_date: today,
+        filename: `visit.${ext}`,
+      });
       finish(v);
     } catch (e) {
-      // Audio transcription needs a real provider; guide the user to text.
+      // Transcription failed; guide the user to the reliable text path.
       setUseText(true);
       setPhase("idle");
-      setError(
-        (e as Error).message +
-          " - tip: in demo mode, use the text option below to summarize a visit."
-      );
+      setError((e as Error).message + " - you can type or paste the visit instead.");
     }
   }
 

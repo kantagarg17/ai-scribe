@@ -23,39 +23,66 @@ export default function SwipeCard({
 
   const startX = useRef(0);
   const startOffset = useRef(0);
-  const dragging = useRef(false);
+  const pointerId = useRef<number | null>(null);
+  const tracking = useRef(false); // pointer is down, watching for a drag
+  const dragging = useRef(false); // a real horizontal drag has begun
   const moved = useRef(false);
 
   const ACTION_W = 88; // width of the revealed Delete action
   const THRESHOLD = 44;
+  const DRAG_START = 8; // px of horizontal movement before it counts as a drag
 
   function onPointerDown(e: PointerEvent) {
     if (confirming) return;
-    dragging.current = true;
+    tracking.current = true;
+    dragging.current = false;
     moved.current = false;
     startX.current = e.clientX;
     startOffset.current = offset;
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    pointerId.current = e.pointerId;
+    // NOTE: do NOT capture the pointer here — capturing on a plain tap/click
+    // suppresses the follow-up `click`, which broke card expansion. We only
+    // capture once a real horizontal drag starts (below).
   }
 
   function onPointerMove(e: PointerEvent) {
-    if (!dragging.current) return;
+    if (!tracking.current) return;
     const dx = e.clientX - startX.current;
-    if (Math.abs(dx) > 4) moved.current = true;
+
+    if (!dragging.current) {
+      if (Math.abs(dx) < DRAG_START) return; // still just a tap, let click happen
+      dragging.current = true;
+      moved.current = true;
+      try {
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+    }
+
     let next = startOffset.current + dx;
     next = Math.min(0, Math.max(-ACTION_W, next)); // clamp between closed and fully open
     setOffset(next);
   }
 
-  function onPointerUp() {
-    if (!dragging.current) return;
+  function onPointerUp(e: PointerEvent) {
+    if (!tracking.current) return;
+    tracking.current = false;
+    if (pointerId.current != null) {
+      try {
+        (e.currentTarget as HTMLElement).releasePointerCapture(pointerId.current);
+      } catch {
+        /* ignore */
+      }
+    }
+    if (!dragging.current) return; // a tap — leave the click to expand the card
     dragging.current = false;
     const shouldOpen = offset < -THRESHOLD;
     setOpen(shouldOpen);
     setOffset(shouldOpen ? -ACTION_W : 0);
   }
 
-  // Prevent the card's own click (expand) from firing right after a swipe.
+  // Block the card's own click only when a real swipe just happened.
   function onClickCapture(e: React.MouseEvent) {
     if (moved.current) {
       e.stopPropagation();

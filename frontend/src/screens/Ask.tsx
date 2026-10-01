@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api, Source } from "../api";
+import { api, primeChat, Source } from "../api";
 
 interface Turn {
   role: "user" | "assistant";
@@ -19,6 +19,11 @@ export default function Ask({ patientId }: { patientId: number }) {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Warm the cache for the suggested questions so tapping them feels instant.
+  useEffect(() => {
+    primeChat(patientId, SUGGESTIONS);
+  }, [patientId]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
