@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { api, VisitSummary } from "../api";
+import { addLocalVisit } from "../localRecord";
 import { IconMicLarge, IconStop } from "../icons";
 
 type Phase = "idle" | "recording" | "processing" | "done" | "error";
@@ -96,7 +97,9 @@ export default function Record({
         doc_date: today,
         filename: `visit.${ext}`,
       });
-      finish(v);
+      // No raw transcript on the audio path (transcribed server-side); store
+      // the summary text as the record content so it reads well in the record.
+      finish(v, v.summary);
     } catch (e) {
       // Transcription failed; guide the user to the reliable text path.
       setUseText(true);
@@ -115,14 +118,17 @@ export default function Record({
         title: "Clinic visit",
         doc_date: today,
       });
-      finish(v);
+      finish(v, transcript);
     } catch (e) {
       setError((e as Error).message);
       setPhase("error");
     }
   }
 
-  function finish(v: VisitSummary) {
+  function finish(v: VisitSummary, content: string) {
+    // Persist locally so the visit appears on the Record home page and
+    // survives reloads (the hosted backend is stateless).
+    addLocalVisit(v, content);
     setResult(v);
     setPhase("done");
     onSaved(v);

@@ -2,6 +2,27 @@ import { useEffect, useState } from "react";
 import { api, DocumentItem, DocumentKind, VisitSummary } from "../api";
 import { IconVisit, IconLab, IconScan, IconDischarge } from "../icons";
 import SwipeCard from "../SwipeCard";
+import {
+  getLocalDocuments,
+  getLocalVisitSummaries,
+  isLocalId,
+  removeLocalDocument,
+} from "../localRecord";
+
+/** Merge backend + locally-captured items, newest first, de-duped by id. */
+function mergeDocs(backend: DocumentItem[]): DocumentItem[] {
+  const seen = new Set(backend.map((d) => d.id));
+  const local = getLocalDocuments().filter((d) => !seen.has(d.id));
+  return [...local, ...backend].sort((a, b) =>
+    a.doc_date < b.doc_date ? 1 : a.doc_date > b.doc_date ? -1 : b.created_at.localeCompare(a.created_at)
+  );
+}
+
+function mergeVisits(backend: VisitSummary[]): VisitSummary[] {
+  const seen = new Set(backend.map((v) => v.document_id));
+  const local = getLocalVisitSummaries().filter((v) => !seen.has(v.document_id));
+  return [...local, ...backend].sort((a, b) => (a.doc_date < b.doc_date ? 1 : -1));
+}
 
 type Filter = "all" | DocumentKind;
 
@@ -52,8 +73,9 @@ export default function Home({ patientId }: { patientId: number }) {
     Promise.all([api.listDocuments(patientId), api.listVisits(patientId)])
       .then(([d, v]) => {
         if (!alive) return;
-        setDocs(d);
-        setVisits(v);
+        // Merge in visits captured in this browser (backend is stateless).
+        setDocs(mergeDocs(d));
+        setVisits(mergeVisits(v));
       })
       .finally(() => alive && setLoading(false));
     return () => {
@@ -65,6 +87,10 @@ export default function Home({ patientId }: { patientId: number }) {
     // Optimistically remove from the timeline and any visit summary.
     setDocs((prev) => prev.filter((d) => d.id !== doc.id));
     setVisits((prev) => prev.filter((v) => v.document_id !== doc.id));
+    if (isLocalId(doc.id)) {
+      removeLocalDocument(doc.id); // locally captured — just drop it locally
+      return;
+    }
     try {
       await api.deleteDocument(patientId, doc.id);
     } catch {
@@ -73,8 +99,8 @@ export default function Home({ patientId }: { patientId: number }) {
         api.listDocuments(patientId),
         api.listVisits(patientId),
       ]);
-      setDocs(d);
-      setVisits(v);
+      setDocs(mergeDocs(d));
+      setVisits(mergeVisits(v));
     }
   }
 
