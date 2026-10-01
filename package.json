@@ -1,0 +1,8 @@
+{
+  "name": "ai-scribe",
+  "private": true,
+  "description": "Netlify Functions deps for the AI-Scribe serverless backend.",
+  "devDependencies": {
+    "@netlify/functions": "^3.0.0"
+  }
+}

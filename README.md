@@ -7,7 +7,7 @@
 
 AI-Scribe is **fully open source** (Apache-2.0) and **vendor-neutral**. It runs entirely on your own machine with local open-source models, or against any OpenAI-compatible API endpoint. No proprietary service is required.
 
-**Try the live demo: https://ai-scribe-demo-185.netlify.app** - a static build with a bundled sample record so you can explore every screen from a link. Answers in the demo are pulled from the sample record, not a live AI model; run it locally (below) for real transcription and grounded LLM answers.
+**Try the live demo: https://ai-scribe-demo-185.netlify.app** - a hosted build with real AI. Chat answers, visit summaries, and transcription run live through open models on Groq (`openai/gpt-oss-20b` + Whisper), grounded in a bundled sample record for the demo patient "Dana". Hosted as a Netlify site plus a serverless function; no backend to run yourself.
 
 ## Why
 

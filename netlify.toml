@@ -1,20 +1,23 @@
-# Netlify configuration for the static AI-Scribe demo.
+# Netlify configuration for AI-Scribe: static frontend + a serverless function
+# that provides REAL AI via Groq (grounded chat, visit summaries, Whisper
+# transcription). Frontend and API share one origin, so no CORS or API base URL
+# is needed.
 #
-# Builds the frontend in demo mode (bundled sample data, no backend, no model,
-# no secrets) and serves it at the site root. SPA routes fall back to index.html.
+# base is the repo root so Netlify finds netlify/functions. The frontend is
+# built with an explicit cd.
 
 [build]
-  base = "frontend"
-  command = "npm run build"
+  command = "cd frontend && npm install && npm run build"
   publish = "frontend/dist"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "20"
-  # Use the bundled demo data instead of a backend. Base path stays "/" (root)
-  # because Netlify serves the site at the domain root.
-  VITE_DEMO = "1"
+  # Live mode: the frontend calls the Netlify Function at /api on the same
+  # origin (no VITE_DEMO, no VITE_API_BASE set).
 
-# Single-page app: serve index.html for any unmatched path.
+# The function declares its own routes (/api/*, /health) via `config.path`.
+# This redirect is the SPA fallback for everything else.
 [[redirects]]
   from = "/*"
   to = "/index.html"
