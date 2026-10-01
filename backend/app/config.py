@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     # App
     data_dir: Path = Path("./data")
     cors_origins: str = "http://localhost:5173"
+    # Seed the demo patient on startup if the DB is empty (useful for hosted
+    # deployments where there's no shell to run `python -m app.seed`).
+    seed_on_start: bool = False
 
     # LLM provider
     llm_provider: str = "ollama"  # "ollama" | "openai"

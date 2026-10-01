@@ -231,5 +231,12 @@ export const demoApi = {
   },
 };
 
-/** True when running as the static demo (no backend to talk to). */
-export const IS_DEMO = import.meta.env.VITE_DEMO === "1";
+/**
+ * True when running as the static demo (no backend to talk to).
+ *
+ * Demo mode is on when the build asked for it (VITE_DEMO=1) AND no backend URL
+ * was provided. Setting VITE_API_BASE (e.g. the Render URL) switches the app to
+ * the real hosted backend even if VITE_DEMO=1 is still set.
+ */
+export const IS_DEMO =
+  import.meta.env.VITE_DEMO === "1" && !import.meta.env.VITE_API_BASE;

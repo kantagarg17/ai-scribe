@@ -1,0 +1,43 @@
+# Render deployment for the AI-Scribe backend (free tier).
+#
+# Runs the FastAPI app with Groq (OpenAI-compatible) for the LLM and Whisper
+# transcription, and the built-in lightweight embedder for retrieval (no heavy
+# ML deps, fits the free instance). Set the secret GROQ key and your Netlify
+# origin in the Render dashboard after the first deploy.
+#
+# Free-tier note: the instance sleeps when idle; the first request after idle
+# has a cold start of ~30-60s.
+
+services:
+  - type: web
+    name: ai-scribe-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.13.5"
+      # --- Providers: Groq for LLM + transcription, local lightweight embeddings ---
+      - key: AISCRIBE_LLM_PROVIDER
+        value: openai
+      - key: AISCRIBE_TRANSCRIBE_PROVIDER
+        value: openai
+      - key: AISCRIBE_EMBED_PROVIDER
+        value: mock
+      - key: AISCRIBE_OPENAI_BASE_URL
+        value: https://api.groq.com/openai/v1
+      - key: AISCRIBE_LLM_MODEL
+        value: llama-3.3-70b-versatile
+      - key: AISCRIBE_TRANSCRIBE_MODEL
+        value: whisper-large-v3
+      - key: AISCRIBE_SEED_ON_START
+        value: "1"
+      # Secret - set in the Render dashboard (do NOT commit):
+      - key: AISCRIBE_OPENAI_API_KEY
+        sync: false
+      # Set to your Netlify site origin after the frontend is wired up:
+      - key: AISCRIBE_CORS_ORIGINS
+        sync: false

@@ -14,6 +14,15 @@ from .routers import chat, patients, record, visits
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    # Hosted deployments have no shell to run the seed script, so optionally
+    # seed the demo patient on first boot (no-op if "Dana" already exists).
+    if get_settings().seed_on_start:
+        try:
+            from .seed import seed
+
+            seed()
+        except Exception as exc:  # pragma: no cover - best-effort on boot
+            print(f"[seed_on_start] skipped: {exc}")
     yield
 
 

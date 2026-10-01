@@ -69,26 +69,32 @@ export interface AiScribeApi {
   ask(patientId: number, question: string): Promise<ChatResponse>;
 }
 
+// Absolute backend origin for the hosted build (e.g. the Render URL), set via
+// VITE_API_BASE at build time. Empty by default so local dev uses relative
+// paths through the Vite proxy. Trailing slash is trimmed.
+const API_BASE = (import.meta.env.VITE_API_BASE || "").replace(/\/$/, "");
+const u = (path: string) => `${API_BASE}${path}`;
+
 const liveApi: AiScribeApi = {
   async listPatients(): Promise<Patient[]> {
-    return json(await fetch("/api/patients"));
+    return json(await fetch(u("/api/patients")));
   },
 
   async getPatient(id: number): Promise<Patient> {
-    return json(await fetch(`/api/patients/${id}`));
+    return json(await fetch(u(`/api/patients/${id}`)));
   },
 
   async listDocuments(patientId: number, kind?: DocumentKind): Promise<DocumentItem[]> {
     const q = kind ? `?kind=${kind}` : "";
-    return json(await fetch(`/api/patients/${patientId}/documents${q}`));
+    return json(await fetch(u(`/api/patients/${patientId}/documents${q}`)));
   },
 
   async listVisits(patientId: number): Promise<VisitSummary[]> {
-    return json(await fetch(`/api/patients/${patientId}/visits`));
+    return json(await fetch(u(`/api/patients/${patientId}/visits`)));
   },
 
   async deleteDocument(patientId: number, documentId: number): Promise<void> {
-    const res = await fetch(`/api/patients/${patientId}/documents/${documentId}`, {
+    const res = await fetch(u(`/api/patients/${patientId}/documents/${documentId}`), {
       method: "DELETE",
     });
     if (!res.ok && res.status !== 204) {
@@ -101,7 +107,7 @@ const liveApi: AiScribeApi = {
     payload: { transcript: string; title?: string; doc_date: string }
   ): Promise<VisitSummary> {
     return json(
-      await fetch(`/api/patients/${patientId}/visits/transcript`, {
+      await fetch(u(`/api/patients/${patientId}/visits/transcript`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -119,7 +125,7 @@ const liveApi: AiScribeApi = {
     if (meta.title) form.append("title", meta.title);
     form.append("doc_date", meta.doc_date);
     return json(
-      await fetch(`/api/patients/${patientId}/visits/record`, {
+      await fetch(u(`/api/patients/${patientId}/visits/record`), {
         method: "POST",
         body: form,
       })
@@ -128,7 +134,7 @@ const liveApi: AiScribeApi = {
 
   async ask(patientId: number, question: string): Promise<ChatResponse> {
     return json(
-      await fetch(`/api/patients/${patientId}/chat`, {
+      await fetch(u(`/api/patients/${patientId}/chat`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question }),
