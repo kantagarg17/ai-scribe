@@ -30,7 +30,7 @@ services:
       - key: AISCRIBE_OPENAI_BASE_URL
         value: https://api.groq.com/openai/v1
       - key: AISCRIBE_LLM_MODEL
-        value: llama-3.3-70b-versatile
+        value: openai/gpt-oss-20b
       - key: AISCRIBE_TRANSCRIBE_MODEL
         value: whisper-large-v3
       - key: AISCRIBE_SEED_ON_START
